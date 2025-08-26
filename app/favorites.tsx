@@ -44,7 +44,7 @@ export default function FavoritesScreen() {
 
   const removeFavorite = async (symbol: string) => {
     try {
-      await api.delete(`api/stocks/favorites/${symbol}/remove/`);  // 즐겨찾기 제거 요청
+      await api.delete(`api/stocks/favorites/${symbol}/`);  // 즐겨찾기 제거 요청
       setFavorites(favorites.filter(item => item.symbol !== symbol));  // 로컬에서 목록 업데이트
     } catch {}
   };

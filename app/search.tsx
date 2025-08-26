@@ -35,17 +35,29 @@ export default function SearchScreen() {
       setLoading(false);
     }
   };
-
-  const toggleFavorite = async (id: number, isFavorite: boolean) => {
+  const toggleFavorite = async (id: number, isFavorite: boolean, symbol: string) => {
+    const sym = symbol.toUpperCase(); // 서버는 iexact지만, 클라에선 통일
     try {
       if (isFavorite) {
-        await api.delete(`api/stocks/favorites/${id}/remove/`);
+        // DELETE /api/stocks/favorites/{symbol}/
+        await api.delete(`api/stocks/favorites/${encodeURIComponent(sym)}/`);
       } else {
-        await api.post(`api/stocks/favorites/`, { stock_id: id });
+        // POST /api/stocks/favorites/  { symbol }
+        await api.post(`api/stocks/favorites/`, { symbol: sym });
       }
-      setResults(results.map(item => item.id === id ? { ...item, is_favorite: !isFavorite } : item));
-    } catch {}
+
+      // 결과 리스트에서도 symbol로 동기화 ('.' 등 특수문자 대비 encode 불필요)
+      setResults(prev =>
+        prev.map(it =>
+          it.symbol?.toUpperCase() === sym ? { ...it, is_favorite: !isFavorite } : it
+        )
+      );
+
+    } catch (e) {
+      // 필요하면 여기서 토스트/로그 등 처리
+    }
   };
+
 
   return (
     <View style={styles.container}>
@@ -70,7 +82,7 @@ export default function SearchScreen() {
             symbol={item.symbol}
             name={item.name}
             isFavorite={item.is_favorite}
-            onToggleFavorite={() => toggleFavorite(item.id, item.is_favorite)}
+            onToggleFavorite={() => toggleFavorite(item.id, item.is_favorite,item.symbol)}
           />
         )}
         style={{ width: '100%' }}
