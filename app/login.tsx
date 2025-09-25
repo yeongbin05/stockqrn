@@ -3,6 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } f
 import axios from 'axios';
 import { useAuthStore } from '../store';
 import { useRouter } from 'expo-router';
+import { Platform } from 'react-native';
+import KakaoLogins from '@react-native-seoul/kakao-login';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -37,7 +39,7 @@ export default function LoginScreen() {
     }
     setLoading(true);
     try {
-      const response = await axios.post('http://172.29.48.97:8000/api/users/token/', {
+      const response = await axios.post('http://192.168.1.235:8000/api/users/token/', {
         email,
         password,
       });
@@ -56,6 +58,24 @@ export default function LoginScreen() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+  const handleKakaoLogin = async () => {
+    try {
+      const kakaoResult = await KakaoLogins.login(); // 카카오 SDK 로그인
+      const kakaoAccessToken = kakaoResult.accessToken;
+
+      const response = await axios.post('http://192.168.1.235:8000/api/users/social/kakao/', {
+        access_token: kakaoAccessToken,
+      });
+
+      const { access, refresh } = response.data;
+      await setToken(access, refresh);
+      router.replace('/search');
+      Alert.alert('로그인 성공', '카카오 계정으로 로그인되었습니다.');
+    } catch (err) {
+      console.error(err);
+      Alert.alert('오류', '카카오 로그인 실패');
     }
   };
 
@@ -95,6 +115,8 @@ export default function LoginScreen() {
         onChangeText={setPassword}
       />
       <Button title={loading ? '로그인 중...' : '로그인'} onPress={handleLogin} disabled={loading} />
+      <View style={{ height: 16 }} />
+      <Button title="카카오 로그인" onPress={handleKakaoLogin} />
       <View style={{ height: 16 }} />
       <Button title="회원가입" onPress={() => router.push({ pathname: '/register' } as any)} />
     </View>
