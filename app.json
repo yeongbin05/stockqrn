@@ -39,7 +39,7 @@
     "@react-native-seoul/kakao-login",
     {
       "kakaoAppKey": "네이티브 앱 키", 
-      "overrideKakaoSDKVersion": "2.20.6"
+      "overrideKakaoSDKVersion": "2.20.5"
     }
   ]
 ],
