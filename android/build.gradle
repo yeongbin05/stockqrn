@@ -41,7 +41,7 @@ project.ext {
     set('react-native', [
         versions: [
             kakao: [
-                sdk: "2.20.6",
+                sdk: "2.20.5",
             ],
         ],
     ])

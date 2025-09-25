@@ -25,25 +25,33 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-  "expo-router",
-  [
-    "expo-splash-screen",
-    {
-      "image": "./assets/images/splash-icon.png",
-      "imageWidth": 200,
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    }
-  ],
-  [
-    "@react-native-seoul/kakao-login",
-    {
-      "kakaoAppKey": "네이티브 앱 키", 
-      "overrideKakaoSDKVersion": "2.20.5"
-    }
-  ]
-],
-
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "@react-native-seoul/kakao-login",
+        {
+          "kakaoAppKey": "0aa49cee42caffd0716f0aedcec2b0a9",
+          "overrideKakaoSDKVersion": "2.20.5"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.24",   
+            "gradlePluginVersion": "8.7.2"
+          }
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     },
