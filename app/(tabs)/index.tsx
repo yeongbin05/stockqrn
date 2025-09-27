@@ -1,38 +1,13 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const router = useRouter();
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>홈 화면</Text>
-      <Text style={styles.subtitle}>StockQ 앱에 오신 걸 환영합니다 👋</Text>
+  useEffect(() => {
+    // 홈 화면에서 바로 검색 화면으로 리다이렉트
+    router.replace('/search');
+  }, []);
 
-      <View style={{ marginTop: 24 }}>
-        <Button title="로그인 하기" onPress={() => router.push('/login')} />
-      </View>
-    </View>
-  );
+  return null;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-});

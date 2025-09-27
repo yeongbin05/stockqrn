@@ -11,23 +11,62 @@ interface Props {
 
 export default function StockListItem({ symbol, name, isFavorite, onToggleFavorite }: Props) {
   return (
-    <View style={styles.item}>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.symbol}>{symbol}</Text>
-        <Text>{name}</Text>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.stockInfo}>
+          <Text style={styles.symbol}>{symbol}</Text>
+          <Text style={styles.name} numberOfLines={2}>{name}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={onToggleFavorite}
+          activeOpacity={0.7}
+        >
+          <Ionicons 
+            name={isFavorite ? 'star' : 'star-outline'} 
+            size={24} 
+            color={isFavorite ? '#FFD700' : '#999'} 
+          />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => {
-          console.log('toggleFavorite 호출');  // 로그는 여기서 찍기
-          onToggleFavorite();
-        }}>
-        <Ionicons name={isFavorite ? 'star' : 'star-outline'} size={28} color={isFavorite ? '#FFD700' : '#888'} />
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  item: { flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderColor: '#eee' },
-  symbol: { fontWeight: 'bold', fontSize: 16 },
+  container: {
+    backgroundColor: '#FFFFFF',
+    marginVertical: 4,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  stockInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  symbol: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginBottom: 4,
+  },
+  name: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  favoriteButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#F8F9FA',
+  },
 }); 

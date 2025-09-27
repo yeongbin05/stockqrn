@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from "zustand";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AuthState {
   access: string | null;
@@ -9,22 +9,25 @@ interface AuthState {
   hydrate: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set: any) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   access: null,
   refresh: null,
+
   setToken: async (access: string, refresh: string) => {
-    await AsyncStorage.setItem('access', access);
-    await AsyncStorage.setItem('refresh', refresh);
+    await AsyncStorage.setItem("access", access);
+    await AsyncStorage.setItem("refresh", refresh);
     set({ access, refresh });
   },
+
   clearToken: async () => {
-    await AsyncStorage.removeItem('access');
-    await AsyncStorage.removeItem('refresh');
+    await AsyncStorage.removeItem("access");
+    await AsyncStorage.removeItem("refresh");
     set({ access: null, refresh: null });
   },
+
   hydrate: async () => {
-    const access = await AsyncStorage.getItem('access');
-    const refresh = await AsyncStorage.getItem('refresh');
+    const access = await AsyncStorage.getItem("access");
+    const refresh = await AsyncStorage.getItem("refresh");
     set({ access, refresh });
   },
-})); 
+}));
