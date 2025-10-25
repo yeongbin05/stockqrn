@@ -9,8 +9,8 @@ api.interceptors.request.use(
   async (config) => {
     const { access } = useAuthStore.getState();
 
-    // 실제 API 서버 URL
-    config.baseURL = 'http://192.168.123.109:8000';
+    // 환경 변수에서 API 서버 URL 가져오기
+    config.baseURL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.64:8000';
 
     // 토큰이 있으면 Authorization 헤더 추가
     if (access) {
@@ -36,7 +36,8 @@ api.interceptors.response.use(
       if (refresh) {
         try {
           // refresh 토큰으로 새 access 요청
-          const res = await axios.post('http://192.168.123.109:8000/api/users/token/refresh/', { refresh });
+          const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.64:8000';
+          const res = await axios.post(`${apiBaseUrl}/api/users/token/refresh/`, { refresh });
           const { access } = res.data;
 
           await setToken(access, refresh);

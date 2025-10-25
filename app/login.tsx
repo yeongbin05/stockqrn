@@ -16,6 +16,13 @@ import { useRouter } from "expo-router";
 import KakaoLogins from "@react-native-seoul/kakao-login";
 import api from "./api";
 
+// 웹용 카카오 SDK 타입 선언
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
+
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +36,33 @@ export default function LoginScreen() {
   useEffect(() => {
     const init = async () => {
       await hydrate();
+      
+      // 웹에서 카카오 SDK 로드
+      if (Platform.OS === 'web') {
+        const script = document.createElement('script');
+        script.src = 'https://developers.kakao.com/sdk/js/kakao.js';
+        script.onload = () => {
+          console.log('카카오 SDK 로드 완료');
+          console.log('window.Kakao:', window.Kakao);
+          
+          if (window.Kakao) {
+            // 환경 변수에서 JavaScript 키 가져오기
+            const kakaoKey = process.env.EXPO_PUBLIC_KAKAO_JAVASCRIPT_KEY;
+            console.log('환경 변수 kakaoKey:', kakaoKey);
+            
+            if (kakaoKey) {
+              window.Kakao.init(kakaoKey);
+              console.log('카카오 SDK 초기화 완료');
+            } else {
+              console.error('카카오 JavaScript 키가 설정되지 않았습니다.');
+            }
+          } else {
+            console.error('카카오 SDK가 로드되지 않았습니다.');
+          }
+        };
+        document.head.appendChild(script);
+      }
+      
       setHydrating(false);
     };
     init();
@@ -74,8 +108,36 @@ export default function LoginScreen() {
 
   const handleKakaoLogin = async () => {
     try {
-      const kakaoResult = await KakaoLogins.login();
-      const kakaoAccessToken = kakaoResult.accessToken;
+      let kakaoAccessToken: string;
+
+      if (Platform.OS === 'web') {
+        // 웹용 카카오 로그인
+        console.log('웹 플랫폼에서 카카오 로그인 시도');
+        console.log('window.Kakao:', window.Kakao);
+        
+        if (!window.Kakao) {
+          Alert.alert("오류", "카카오 SDK가 로드되지 않았습니다.");
+          return;
+        }
+
+        await new Promise<void>((resolve, reject) => {
+          window.Kakao.Auth.login({
+            success: (authObj: any) => {
+              console.log('카카오 로그인 성공:', authObj);
+              kakaoAccessToken = authObj.access_token;
+              resolve();
+            },
+            fail: (err: any) => {
+              console.error('카카오 로그인 실패:', err);
+              reject(err);
+            }
+          });
+        });
+      } else {
+        // 모바일용 카카오 로그인
+        const kakaoResult = await KakaoLogins.login();
+        kakaoAccessToken = kakaoResult.accessToken;
+      }
 
       const response = await api.post("/api/users/social/kakao/", {
         access_token: kakaoAccessToken,

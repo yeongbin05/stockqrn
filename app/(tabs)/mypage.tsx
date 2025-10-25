@@ -31,6 +31,7 @@ interface Favorite {
 interface UserInfo {
   id: number;
   email: string;
+  nickname?: string;
 }
 
 export default function FavoritesScreen() {
@@ -156,7 +157,7 @@ export default function FavoritesScreen() {
             <Ionicons name="person" size={40} color="#007AFF" />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userEmail}>{userInfo?.email}</Text>
+            <Text style={styles.userEmail}>{userInfo?.nickname || userInfo?.email}</Text>
             <Text style={styles.userId}>ID: {userInfo?.id}</Text>
           </View>
         </View>
