@@ -7,6 +7,8 @@ import {
   ActivityIndicator, 
   RefreshControl,
   TouchableOpacity,
+  Linking,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,6 +45,8 @@ export default function NewsScreen() {
     } catch (error) {
       console.error('뉴스 조회 실패:', error);
       setNews([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,9 +95,19 @@ export default function NewsScreen() {
       {item.url && (
         <TouchableOpacity 
           style={styles.linkButton}
-          onPress={() => {
-            // 웹뷰나 외부 브라우저로 링크 열기
-            console.log('링크 열기:', item.url);
+          onPress={async () => {
+            try {
+              const url = item.canonical_url || item.url;
+              const canOpen = await Linking.canOpenURL(url);
+              if (canOpen) {
+                await Linking.openURL(url);
+              } else {
+                Alert.alert('오류', '링크를 열 수 없습니다.');
+              }
+            } catch (error) {
+              console.error('링크 열기 실패:', error);
+              Alert.alert('오류', '링크를 여는 중 오류가 발생했습니다.');
+            }
           }}
         >
           <Ionicons name="open-outline" size={16} color="#007AFF" />

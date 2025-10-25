@@ -34,10 +34,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '검색',
+          title: '홈',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons 
-              name={focused ? 'search' : 'search-outline'} 
+              name={focused ? 'home' : 'home-outline'} 
               size={24} 
               color={color} 
             />
@@ -45,12 +45,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="favorites"
+        name="search"
         options={{
-          title: '즐겨찾기',
+          title: '검색',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons 
-              name={focused ? 'star' : 'star-outline'} 
+              name={focused ? 'search' : 'search-outline'} 
               size={24} 
               color={color} 
             />
@@ -71,12 +71,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="news-summary"
+        name="mypage"
         options={{
-          title: '요약',
+          title: '마이페이지',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons 
-              name={focused ? 'analytics' : 'analytics-outline'} 
+              name={focused ? 'person' : 'person-outline'} 
               size={24} 
               color={color} 
             />

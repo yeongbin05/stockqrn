@@ -9,12 +9,12 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import api from './api';
+import api from '../api';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../store';
+import { useAuthStore } from '../../store';
 import { useRouter } from 'expo-router';
-import StockListItem from '../components/StockListItem';
-import LogoutButton from '../components/LogoutButton';
+import StockListItem from '../../components/StockListItem';
+import LogoutButton from '../../components/LogoutButton';
 
 interface Stock {
   id: number;
@@ -52,10 +52,7 @@ export default function SearchScreen() {
   };
 
   const handleSearch = async () => {
-    if (!query.trim()) {
-      setShowFavorites(true);
-      return;
-    }
+    if (!query.trim()) return;
     
     setLoading(true);
     setShowFavorites(false);
@@ -64,7 +61,7 @@ export default function SearchScreen() {
       setResults(res.data);
     } catch (e) {
       console.error('검색 실패:', e);
-      Alert.alert('오류', '종목 검색에 실패했습니다.');
+      Alert.alert('오류', '검색 중 오류가 발생했습니다.');
       setResults([]);
     } finally {
       setLoading(false);
@@ -72,32 +69,18 @@ export default function SearchScreen() {
   };
 
   const toggleFavorite = async (id: number, isFavorite: boolean, symbol: string) => {
-    const sym = symbol.toUpperCase();
     try {
       if (isFavorite) {
-        await api.delete(`/api/stocks/favorites/${encodeURIComponent(sym)}/`);
-        Alert.alert('성공', `${sym}을(를) 즐겨찾기에서 제거했습니다.`);
+        await api.delete(`/api/stocks/favorites/${symbol}/`);
+        Alert.alert('성공', `${symbol}을(를) 즐겨찾기에서 제거했습니다.`);
       } else {
-        await api.post(`/api/stocks/favorites/`, { symbol: sym });
-        Alert.alert('성공', `${sym}을(를) 즐겨찾기에 추가했습니다.`);
+        await api.post('/api/stocks/favorites/', { stock_id: id });
+        Alert.alert('성공', `${symbol}을(를) 즐겨찾기에 추가했습니다.`);
       }
-
-      // 결과 리스트에서도 symbol로 동기화
-      setResults(prev =>
-        prev.map(it =>
-          it.symbol?.toUpperCase() === sym ? { ...it, is_favorite: !isFavorite } : it
-        )
-      );
-
-      // 즐겨찾기 목록도 새로고침
-      fetchFavorites();
-
-    } catch (e: any) {
-      if (e.response?.status === 409) {
-        Alert.alert('알림', '이미 즐겨찾기에 등록된 종목입니다.');
-      } else {
-        Alert.alert('오류', '즐겨찾기 변경에 실패했습니다.');
-      }
+      fetchFavorites(); // 목록 새로고침
+    } catch (e) {
+      console.error('즐겨찾기 토글 실패:', e);
+      Alert.alert('오류', '즐겨찾기 변경에 실패했습니다.');
     }
   };
 
@@ -113,7 +96,7 @@ export default function SearchScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>StockQ</Text>
+        <Text style={styles.title}>종목 검색</Text>
         <LogoutButton />
       </View>
 
@@ -247,7 +230,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E1E5E9',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     marginRight: 12,
   },
   searchIcon: {
@@ -255,32 +239,29 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: 44,
     fontSize: 16,
     color: '#333',
   },
   searchButton: {
     backgroundColor: '#007AFF',
     borderRadius: 12,
-    padding: 12,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tabContainer: {
     flexDirection: 'row',
     backgroundColor: '#F8F9FA',
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingVertical: 8,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    marginRight: 8,
+    marginHorizontal: 4,
     alignItems: 'center',
   },
   activeTab: {
@@ -288,7 +269,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#666',
   },
   activeTabText: {
@@ -298,10 +279,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 40,
+    backgroundColor: '#FFFFFF',
   },
   loadingText: {
-    marginTop: 12,
+    marginTop: 16,
     fontSize: 16,
     color: '#007AFF',
   },

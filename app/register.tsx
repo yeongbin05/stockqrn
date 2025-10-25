@@ -23,7 +23,7 @@ export default function RegisterScreen() {
   const { access } = useAuthStore();
 
   useEffect(() => {
-    if (access) router.replace('/search');
+    if (access) router.replace('/mypage');
   }, [access]);
 
   const handleRegister = async () => {

@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import api from './api';
@@ -99,8 +100,18 @@ export default function NewsSummaryScreen() {
       {item.url && (
         <TouchableOpacity 
           style={styles.linkButton}
-          onPress={() => {
-            console.log('링크 열기:', item.url);
+          onPress={async () => {
+            try {
+              const canOpen = await Linking.canOpenURL(item.url);
+              if (canOpen) {
+                await Linking.openURL(item.url);
+              } else {
+                Alert.alert('오류', '링크를 열 수 없습니다.');
+              }
+            } catch (error) {
+              console.error('링크 열기 실패:', error);
+              Alert.alert('오류', '링크를 여는 중 오류가 발생했습니다.');
+            }
           }}
         >
           <Ionicons name="open-outline" size={16} color="#007AFF" />

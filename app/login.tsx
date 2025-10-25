@@ -39,7 +39,7 @@ export default function LoginScreen() {
   }, [access]);
 
   useEffect(() => {
-    if (access) router.replace("/search");
+    if (access) router.replace("/mypage");
   }, [access]);
 
   // 서버 주소는 이미 api.ts에서 하드코딩되어 있음
@@ -58,7 +58,7 @@ export default function LoginScreen() {
       const { access, refresh } = response.data;
       await setToken(access, refresh);
       setLoggedIn(true);
-      router.replace("/search");
+      router.replace("/mypage");
       Alert.alert("로그인 성공", "토큰 저장 완료!");
     } catch (error: any) {
       if (error.response) {
@@ -83,7 +83,7 @@ export default function LoginScreen() {
 
       const { access, refresh } = response.data;
       await setToken(access, refresh);
-      router.replace("/search");
+      router.replace("/mypage");
       Alert.alert("로그인 성공", "카카오 계정으로 로그인되었습니다.");
     } catch (err) {
       console.error(err);
