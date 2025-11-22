@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -45,8 +46,7 @@
       [
         "expo-build-properties",
         {
-          "android": {
-          }
+          "android": {}
         }
       ]
     ],

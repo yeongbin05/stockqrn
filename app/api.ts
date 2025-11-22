@@ -1,18 +1,31 @@
 import axios from "axios";
+import { Platform } from "react-native";
 import { useAuthStore } from "../store";
 
-// Axios 인스턴스 생성 (baseURL은 store에서 동적으로 주입)
-const api = axios.create();
+// ✅ 1) fallback 주소 (모바일/릴리즈에서 env가 비어도 무조건 여길 씀)
+const FALLBACK_BASE_URL =
+  Platform.OS === "web"
+    ? "http://localhost:8000"
+    : "http://3.34.198.161:8000"; // ✅ 네 AWS 서버
 
-// ✅ baseURL 인터셉터
+// ✅ 2) Axios 인스턴스 생성 (처음부터 baseURL을 넣어둠)
+const api = axios.create({
+  baseURL: process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_BASE_URL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// ✅ 3) request interceptor
 api.interceptors.request.use(
   async (config) => {
     const { access } = useAuthStore.getState();
 
-    // 환경 변수에서 API 서버 URL 가져오기
-    config.baseURL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.64:8000';
+    // ⚠️ 매번 env로 덮어쓰되, env가 없으면 fallback 유지
+    const baseURL = process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_BASE_URL;
+    config.baseURL = baseURL;
 
-    // 토큰이 있으면 Authorization 헤더 추가
     if (access) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${access}`;
@@ -23,27 +36,44 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ 401 에러 → 토큰 자동 갱신
+// ✅ 4) response interceptor (401 → refresh → retry)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // 무한루프 방지
-      const { refresh, setToken, clearToken } = useAuthStore.getState();
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      const { refresh, setToken, clearToken } =
+        useAuthStore.getState();
 
       if (refresh) {
         try {
-          // refresh 토큰으로 새 access 요청
-          const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://192.168.1.64:8000';
-          const res = await axios.post(`${apiBaseUrl}/api/users/token/refresh/`, { refresh });
-          const { access } = res.data;
+          const baseURL =
+            process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_BASE_URL;
 
-          await setToken(access, refresh);
-          originalRequest.headers["Authorization"] = `Bearer ${access}`;
+          const res = await axios.post(
+            `${baseURL}/api/users/token/refresh/`,
+            { refresh },
+            { headers: { "Content-Type": "application/json" } }
+          );
 
-          return api(originalRequest); // 실패했던 요청 재시도
+          const { access: newAccess } = res.data;
+
+          await setToken(newAccess, refresh);
+
+          originalRequest.headers =
+            originalRequest.headers || {};
+          originalRequest.headers[
+            "Authorization"
+          ] = `Bearer ${newAccess}`;
+
+          return api(originalRequest);
         } catch (refreshError) {
           console.error("Refresh Token 만료 또는 에러", refreshError);
           await clearToken();
