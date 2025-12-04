@@ -6,7 +6,7 @@ import { useAuthStore } from "../store";
 const FALLBACK_BASE_URL =
   Platform.OS === "web"
     ? "http://localhost:8000"
-    : "http://3.34.198.161:8000"; // ✅ 네 AWS 서버
+    : "https://stockqapp.com"; // ✅ 네 AWS 서버
 
 // ✅ 2) Axios 인스턴스 생성 (처음부터 baseURL을 넣어둠)
 const api = axios.create({

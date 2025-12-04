@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import KakaoLogins from "@react-native-seoul/kakao-login";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuthStore } from "../store";
-import { useRouter } from "expo-router";
-import KakaoLogins from "@react-native-seoul/kakao-login";
 import api from "./api";
 
 // 웹용 카카오 SDK 타입 선언
@@ -77,6 +77,7 @@ export default function LoginScreen() {
   }, [access]);
 
   // 서버 주소는 이미 api.ts에서 하드코딩되어 있음
+  Alert.alert("DEBUG", api.defaults.baseURL || "baseURL 없음");
 
   const handleLogin = async () => {
     if (!email || !password) {
