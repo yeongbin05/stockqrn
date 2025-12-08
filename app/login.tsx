@@ -77,7 +77,7 @@ export default function LoginScreen() {
   }, [access]);
 
   // 서버 주소는 이미 api.ts에서 하드코딩되어 있음
-  Alert.alert("DEBUG", api.defaults.baseURL || "baseURL 없음");
+  // Alert.alert("DEBUG", api.defaults.baseURL || "baseURL 없음");
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -87,7 +87,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       const response = await api.post("/api/users/token/", {
-        email,
+        username: email,
         password,
       });
       const { access, refresh } = response.data;
