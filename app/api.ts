@@ -1,30 +1,25 @@
+// app/api.ts
 import axios from "axios";
-import { Platform } from "react-native";
 import { useAuthStore } from "../store";
 
-// ✅ 1) fallback 주소 (모바일/릴리즈에서 env가 비어도 무조건 여길 씀)
-const FALLBACK_BASE_URL =
-  Platform.OS === "web"
-    ? "http://localhost:8000"
-    : "https://stockqapp.com"; // ✅ 네 AWS 서버
+// ✅ 이제는 모든 플랫폼에서 이 주소만 사용
+const BASE_URL = "https://stockqapp.com";
 
-// ✅ 2) Axios 인스턴스 생성 (처음부터 baseURL을 넣어둠)
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_BASE_URL,
+  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// ✅ 3) request interceptor
+// ✅ 요청 인터셉터: 항상 BASE_URL 고정 + 토큰 자동 첨부
 api.interceptors.request.use(
   async (config) => {
     const { access } = useAuthStore.getState();
 
-    // ⚠️ 매번 env로 덮어쓰되, env가 없으면 fallback 유지
-    const baseURL = process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_BASE_URL;
-    config.baseURL = baseURL;
+    // 혹시라도 다른 데서 baseURL 건드려도 여기서 다시 고정
+    config.baseURL = BASE_URL;
 
     if (access) {
       config.headers = config.headers || {};
@@ -36,29 +31,26 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ 4) response interceptor (401 → refresh → retry)
+// ✅ 응답 인터셉터: 401 이면 refresh로 재발급 → 한 번만 재시도
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    // 응답이 없거나, 요청 객체가 없으면 그냥 에러 리턴
+    if (!error.response || !originalRequest) {
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      const { refresh, setToken, clearToken } =
-        useAuthStore.getState();
+      const { refresh, setToken, clearToken } = useAuthStore.getState();
 
       if (refresh) {
         try {
-          const baseURL =
-            process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_BASE_URL;
-
           const res = await axios.post(
-            `${baseURL}/api/users/token/refresh/`,
+            `${BASE_URL}/api/users/token/refresh/`,
             { refresh },
             { headers: { "Content-Type": "application/json" } }
           );
@@ -67,11 +59,8 @@ api.interceptors.response.use(
 
           await setToken(newAccess, refresh);
 
-          originalRequest.headers =
-            originalRequest.headers || {};
-          originalRequest.headers[
-            "Authorization"
-          ] = `Bearer ${newAccess}`;
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers["Authorization"] = `Bearer ${newAccess}`;
 
           return api(originalRequest);
         } catch (refreshError) {

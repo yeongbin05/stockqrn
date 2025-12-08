@@ -87,7 +87,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       const response = await api.post("/api/users/token/", {
-        username: email,
+        email,
         password,
       });
       const { access, refresh } = response.data;
