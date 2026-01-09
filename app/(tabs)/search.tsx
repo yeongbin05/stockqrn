@@ -74,7 +74,7 @@ export default function SearchScreen() {
         await api.delete(`/api/stocks/favorites/${symbol}/`);
         Alert.alert('성공', `${symbol}을(를) 즐겨찾기에서 제거했습니다.`);
       } else {
-        await api.post('/api/stocks/favorites/', { stock_id: id });
+        await api.post('/api/stocks/favorites/', { symbol: symbol });
         Alert.alert('성공', `${symbol}을(를) 즐겨찾기에 추가했습니다.`);
       }
       fetchFavorites(); // 목록 새로고침
