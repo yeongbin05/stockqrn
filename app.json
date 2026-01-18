@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "usesCleartextTraffic": true,
@@ -18,7 +21,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.stockqrnexpo"
+      "package": "com.anonymous.stockqrnexpo",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -58,6 +62,9 @@
       "eas": {
         "projectId": "5a8521ba-52f7-4b6f-9de9-538e9803a9ec"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5a8521ba-52f7-4b6f-9de9-538e9803a9ec"
     }
   }
 }

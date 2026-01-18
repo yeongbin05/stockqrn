@@ -86,7 +86,7 @@ export default function LoginScreen() {
     }
     setLoading(true);
     try {
-      const response = await api.post("/api/users/token/", {
+      const response = await api.post("/api/auth/token/", {
         email,
         password,
       });
@@ -140,7 +140,7 @@ export default function LoginScreen() {
         kakaoAccessToken = kakaoResult.accessToken;
       }
 
-      const response = await api.post("/api/users/social/kakao/", {
+      const response = await api.post("/api/auth/social/kakao/", {
         access_token: kakaoAccessToken,
       });
 

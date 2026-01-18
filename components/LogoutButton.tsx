@@ -13,7 +13,7 @@ export default function LogoutButton() {
     try {
       // 백엔드에 로그아웃 요청 (토큰 블랙리스트 처리)
       if (refresh) {
-        await api.post('/api/users/auth/logout/', { refresh });
+        await api.post('/api/auth/logout/', { refresh });
       }
     } catch (error) {
       console.error('로그아웃 API 호출 실패:', error);

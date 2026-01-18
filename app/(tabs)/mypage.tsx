@@ -91,7 +91,7 @@ export default function FavoritesScreen() {
   const handleLogout = async () => {
     try {
       if (refresh) {
-        await api.post('/api/users/auth/logout/', { refresh });
+        await api.post('/api/auth/logout/', { refresh });
       }
     } catch (error) {
       console.error('로그아웃 API 호출 실패:', error);
@@ -112,7 +112,7 @@ export default function FavoritesScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await api.delete('/api/users/auth/signout/');
+              await api.delete('/api/auth/deactivate/');
               Alert.alert('탈퇴 완료', '회원 탈퇴가 완료되었습니다.');
               await clearToken();
               router.replace('/login');

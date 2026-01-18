@@ -50,7 +50,7 @@ api.interceptors.response.use(
       if (refresh) {
         try {
           const res = await axios.post(
-            `${BASE_URL}/api/users/token/refresh/`,
+            `${BASE_URL}/api/auth/token/refresh/`,
             { refresh },
             { headers: { "Content-Type": "application/json" } }
           );
